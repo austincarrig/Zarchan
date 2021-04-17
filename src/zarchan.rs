@@ -5,11 +5,32 @@ Written by Austin Carrig, created 4/11/21
 
 Code obtained from Tactical and Strategic Missile Guidance by Paul Zarchan.
 */
+
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::Path;
+
 #[allow(unused_assignments)]
 #[allow(unused_variables)]
 #[allow(unused_mut)]
 
 fn main() {
+    let path = Path::new("./output/data.txt");
+
+    // Open a file in write-only mode, returns `io::Result<File>`
+    let mut file = match File::create(&path) {
+        Err(why) => panic!("couldn't create {}: {}", path.display(), why),
+        Ok(file) => file,
+    };
+    
+    file.write_all("t ".as_bytes()).expect("Failed to write.");
+    file.write_all("rt1 ".as_bytes()).expect("Failed to write.");
+    file.write_all("rt2 ".as_bytes()).expect("Failed to write.");
+    file.write_all("rm1 ".as_bytes()).expect("Failed to write.");
+    file.write_all("rm2 ".as_bytes()).expect("Failed to write.");
+    file.write_all("xnc ".as_bytes()).expect("Failed to write.");
+    file.write_all("rtm\n".as_bytes()).expect("Failed to write.");
+    
     // Constants...
     let vm: f64 = 3000.0;
     let vt: f64 = 1000.0;
@@ -132,14 +153,20 @@ fn main() {
         if s >= 0.09999
         {
             s = 0.0;
-
-            println!("T  : {}", t.to_string());
-            println!("RT1: {}", rt1.to_string());
-            println!("RT2: {}", rt2.to_string());
-            println!("RM1: {}", rm1.to_string());
-            println!("RM2: {}", rm2.to_string());
-            println!("XNC: {}", xnc.to_string());
-            println!("RTM: {}", rtm.to_string());
+            
+            file.write_all(format!("{} ", t.to_string()).as_bytes()).expect("Failed to write.");
+            file.write_all(format!("{} ", rt1.to_string()).as_bytes()).expect("Failed to write.");
+            file.write_all(format!("{} ", rt2.to_string()).as_bytes()).expect("Failed to write.");
+            file.write_all(format!("{} ", rm1.to_string()).as_bytes()).expect("Failed to write.");
+            file.write_all(format!("{} ", rm2.to_string()).as_bytes()).expect("Failed to write.");
+            file.write_all(format!("{} ", xnc.to_string()).as_bytes()).expect("Failed to write.");
+            file.write_all(format!("{}\n", rtm.to_string()).as_bytes()).expect("Failed to write.");
+            //write!(file, "{} ", rt1.to_string());
+            //write!(file, "{} ", rt2.to_string());
+            //write!(file, "{} ", rm1.to_string());
+            //write!(file, "{} ", rm2.to_string());
+            //write!(file, "{} ", xnc.to_string());
+            //write!(file, "{}\n", rtm.to_string());
             
         }
         // STOP 55
@@ -148,11 +175,11 @@ fn main() {
     // ORDER: 10 -> 200 -> 66 -> 200 -> 55 -> 10
     // exit condition is vc < 0
 
-    println!("T  : {}", t.to_string());
-    println!("RT1: {}", rt1.to_string());
-    println!("RT2: {}", rt2.to_string());
-    println!("RM1: {}", rm1.to_string());
-    println!("RM2: {}", rm2.to_string());
-    println!("XNC: {}", xnc.to_string());
-    println!("RTM: {}", rtm.to_string());
+    file.write_all(format!("{} ", t.to_string()).as_bytes()).expect("Failed to write.");
+    file.write_all(format!("{} ", rt1.to_string()).as_bytes()).expect("Failed to write.");
+    file.write_all(format!("{} ", rt2.to_string()).as_bytes()).expect("Failed to write.");
+    file.write_all(format!("{} ", rm1.to_string()).as_bytes()).expect("Failed to write.");
+    file.write_all(format!("{} ", rm2.to_string()).as_bytes()).expect("Failed to write.");
+    file.write_all(format!("{} ", xnc.to_string()).as_bytes()).expect("Failed to write.");
+    file.write_all(format!("{}\n", rtm.to_string()).as_bytes()).expect("Failed to write.");
 }
