@@ -6,20 +6,84 @@ Written by Austin Carrig, created 4/11/21
 Code obtained from Tactical and Strategic Missile Guidance by Paul Zarchan.
 */
 
+use std::collections::HashMap;
+use std::env;
 use std::fs::File;
+use std::fs;
 use std::io::prelude::*;
-use std::path::Path;
+use std::io::{self, BufRead};
+use std::path::{Path, PathBuf};
+
+#[allow(non_snake_case)]
+fn GetInput(inputs: HashMap<String, String>, key: String) -> String {
+    match inputs.get(&key) {
+        Some(input) => input.to_string(),
+        None => panic!("Invalid input token in input file.")
+    }
+}
 
 #[allow(unused_assignments)]
 #[allow(unused_variables)]
 #[allow(unused_mut)]
-
+#[allow(non_snake_case)]
 fn main() {
-    let path = Path::new("./output/data.txt");
+
+    let args: Vec<String> = env::args().collect();
+
+    if args.len() == 1 {
+        panic!("No input file was provided to Zarchan. The user must provide the path to an input file.");
+    } else if args.len() > 2 {
+        panic!("More than one input provided. The only accepted input is a path to the input file.");
+    } else if args.len() == 0 {
+        panic!("This should never happen!!! No env::args() detected.");
+    }
+
+    //==========================
+    // READ INPUT
+    //==========================
+
+    let inputFile = &args[1];
+
+    // Shadowing inputFile...
+    let inputFile = File::open(inputFile).expect("Could not open input file provided.");
+    // Read the lines from the input file
+    let lines = io::BufReader::new(inputFile).lines();
+
+    let mut inputs = HashMap::new();
+
+    // Read in all lines of the input file into an "inputs" HashMap
+    for line in lines {
+        // # is for comments in the input file
+        // any line with an input will be "key = value"
+        if let Ok(ip) = line {
+            if ip.contains("=") && !ip.starts_with("#") {
+                let parts: Vec<&str> = ip.split('=').collect();
+    
+                inputs.insert(
+                    parts[0].trim().to_string(),
+                    parts[1].trim().to_string()
+                );
+            }
+        }
+    }
+
+    // Store off the outputDirectory from the input file
+    let outputDirectory: String = GetInput(inputs, "outputDirectory".to_string());
+
+    // Create a path from the provided outputDirectory
+    let outputPath = Path::new(&outputDirectory);
+
+    // Create directory if it doesn't exist
+    if !outputPath.exists() {
+        fs::create_dir(&outputDirectory).expect("Failed to create output directory.");
+    }
+
+    // Path to
+    let outputFilePath: PathBuf = [outputDirectory, "data.txt".to_string()].iter().collect();
 
     // Open a file in write-only mode, returns `io::Result<File>`
-    let mut file = match File::create(&path) {
-        Err(why) => panic!("couldn't create {}: {}", path.display(), why),
+    let mut file = match File::create(&outputFilePath) {
+        Err(why) => panic!("couldn't create {}: {}", outputFilePath.display(), why),
         Ok(file) => file,
     };
     
@@ -68,15 +132,13 @@ fn main() {
     let mut xnc: f64 = 0.0;
 
     // START 10
-    while vc >= 0.0 && t < 200.0
-    {
+    while vc >= 0.0 && t < 200.0 {
+
         let mut h: f64 = 0.0;
-        if rtm < 1000.0
-        {
+        if rtm < 1000.0 {
             h = 0.0002
         }
-        else
-        {
+        else {
             h = 0.01
         }
 
@@ -150,8 +212,7 @@ fn main() {
 
         s = s + h;
 
-        if s >= 0.09999
-        {
+        if s >= 0.09999 {
             s = 0.0;
             
             file.write_all(format!("{} ", t.to_string()).as_bytes()).expect("Failed to write.");
